@@ -12,8 +12,8 @@ for %%i in (1 2 3 4) do (
 		set a%%i%%j=f
 	)
 )
-:main
 call :drop
+:main
 call :drop
 cls
 if !score! gtr !bests! set bests=!score!
