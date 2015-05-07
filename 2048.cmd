@@ -70,15 +70,7 @@ for %%a in (!inl!) do (
 		if %%a equ b (set buf=c&set /a score+=8192)
 		if %%a equ a (set buf=b&set /a score+=4096)
 		if %%a equ 9 (set buf=a&set /a score+=2048)
-		if %%a equ 8 (set buf=9&set /a "score+=2<<buf")
-		if %%a equ 7 (set buf=8&set /a "score+=2<<buf")
-		if %%a equ 6 (set buf=7&set /a "score+=2<<buf")
-		if %%a equ 5 (set buf=6&set /a "score+=2<<buf")
-		if %%a equ 4 (set buf=5&set /a "score+=2<<buf")
-		if %%a equ 3 (set buf=4&set /a "score+=2<<buf")
-		if %%a equ 2 (set buf=3&set /a "score+=2<<buf")
-		if %%a equ 1 (set buf=2&set /a "score+=2<<buf")
-		if %%a equ 0 (set buf=1&set /a "score+=2<<buf")
+		if %%a lss 9 (set /a buf+=1&set /a "score+=2<<buf")
 		set out=!buf!!out!
 		set buf=
 	) else (
