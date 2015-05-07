@@ -21,8 +21,8 @@ for %%i in (1 2 3 4) do (
 	set line=
 	for %%j in (1 2 3 4) do (
 		set tmp=0x!a%%i%%j!
-		set /a tmp="2 << tmp"
-		if !tmp! equ 65536 set tmp=0
+		set /a "tmp=2<<tmp"
+		if !tmp! equ 65536 set "tmp= "
 		set tmp=    !tmp!
 		set line=!line!³!tmp:~-5!³
 	)
