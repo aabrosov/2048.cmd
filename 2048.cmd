@@ -1,10 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 title 2048 for cmd
-if not exist score_2048.txt echo 0>score_2048.txt
-for /f %%a in (score_2048.txt) do set bests=%%a
-set /a tests=bests*2
-if !bests! neq !tests! set /a bests=tests/2
+for /f %%a in (score_2048.txt) do set /a bests=0+%%a
 :init
 set score=0
 for %%i in (1 2 3 4) do (
