@@ -12,9 +12,9 @@ for %%i in (1 2 3 4) do (
 		set a%%i%%j=f
 	)
 )
-call :drop
-call :drop
 :main
+call :drop
+call :drop
 cls
 if !score! gtr !bests! set bests=!score!
 for %%i in (1 2 3 4) do (
@@ -33,40 +33,24 @@ for %%i in (1 2 3 4) do (
 echo score = !score!
 echo bests = !bests!
 echo.
-choice /c wasdxr /n /m " [w]  [a]  [s]  [d] or e[x]it or [r]eset"
-set switch=!errorlevel!
-if !switch! equ 6 goto :init
-if !switch! equ 5 goto :exit
-if !switch! equ 4 (
-	for %%i in (1 2 3 4) do (
-		call :calc a%%i1 a%%i2 a%%i3 a%%i4
-	)
-	goto :next
+choice /c xwasdr /n /m " [w]  [a]  [s]  [d] or e[x]it or [r]eset"
+if errorlevel 6 goto :init
+if errorlevel 5 (
+	for %%i in (1 2 3 4) do call :calc a%%i1 a%%i2 a%%i3 a%%i4
+	goto :main
 )
-if !switch! equ 3 (
-	for %%i in (1 2 3 4) do (
-		call :calc a1%%i a2%%i a3%%i a4%%i
-	)
-	goto :next
+if errorlevel 4 (
+	for %%i in (1 2 3 4) do call :calc a1%%i a2%%i a3%%i a4%%i
+	goto :main
 )
-if !switch! equ 2 (
-	for %%i in (1 2 3 4) do (
-		call :calc a%%i4 a%%i3 a%%i2 a%%i1
-	)
-	goto :next
+if errorlevel 3 (
+	for %%i in (1 2 3 4) do call :calc a%%i4 a%%i3 a%%i2 a%%i1
+	goto :main
 )
-if !switch! equ 1 (
-	for %%i in (1 2 3 4) do (
-		call :calc a4%%i a3%%i a2%%i a1%%i
-	)
-	goto :next
+if errorlevel 2 (
+	for %%i in (1 2 3 4) do call :calc a4%%i a3%%i a2%%i a1%%i
+	goto :main
 )
-goto :exit
-:next
-call :drop
-call :drop
-goto :main
-:exit
 if !score! gtr !bests! set bests=!score!
 echo !bests!>score_2048.txt
 goto :eof
