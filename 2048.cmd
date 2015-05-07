@@ -9,7 +9,7 @@ if !bests! neq !tests! set /a bests=tests/2
 set score=0
 for %%i in (1 2 3 4) do (
 	for %%j in (1 2 3 4) do (
-		set a%%i%%j=f
+		set a%%i%%j=0
 	)
 )
 call :drop
@@ -20,10 +20,8 @@ if !score! gtr !bests! set bests=!score!
 for %%i in (1 2 3 4) do (
 	set line=
 	for %%j in (1 2 3 4) do (
-		set tmp=0x!a%%i%%j!
-		set /a "tmp=2<<tmp"
-		if !tmp! equ 65536 set "tmp= "
-		set tmp=    !tmp!
+		set tmp=    !a%%i%%j!
+		if !tmp! equ 0 set "tmp=     "
 		set line=!line!³!tmp:~-5!³
 	)
 	echo ÚÄÄÄÄÄ¿ÚÄÄÄÄÄ¿ÚÄÄÄÄÄ¿ÚÄÄÄÄÄ¿
@@ -54,54 +52,52 @@ if errorlevel 2 (
 if !score! gtr !bests! set bests=!score!
 echo !bests!>score_2048.txt
 goto :eof
+
 :calc
 set inl=
-if !%4! neq f set inl=!inl! !%4!
-if !%3! neq f set inl=!inl! !%3!
-if !%2! neq f set inl=!inl! !%2!
-if !%1! neq f set inl=!inl! !%1!
+if !%4! neq 0 set inl=!inl! !%4!
+if !%3! neq 0 set inl=!inl! !%3!
+if !%2! neq 0 set inl=!inl! !%2!
+if !%1! neq 0 set inl=!inl! !%1!
 set out=
 set buf=
 for %%a in (!inl!) do (
-	if "%%a" equ "!buf!" (
-		if %%a equ e (echo "wtf you already won"&pause&exit)
-		if %%a equ d (set buf=e&set /a score+=32768)
-		if %%a equ c (set buf=d&set /a score+=16384)
-		if %%a equ b (set buf=c&set /a score+=8192)
-		if %%a equ a (set buf=b&set /a score+=4096)
-		if %%a equ 9 (set buf=a&set /a score+=2048)
-		if %%a lss 9 (set /a buf+=1&set /a "score+=2<<buf")
-		set out=!buf!!out!
-		set buf=
-	) else (
-		set out=!buf!!out!
-		set buf=%%a
+	set cur=%%a
+	if "!cur!" equ "!buf!" (
+		if !cur! equ 65536 (echo.triumph&pause&exit)
+		set /a buf*=2
+		set /a score+=buf
+		set cur=
 	)
+	set out=!out! !buf!
+	set buf=!cur!
 )
-set out=ffff!buf!!out!
-set out=!out:~-4!
-set %1=!out:~0,1!
-set %2=!out:~1,1!
-set %3=!out:~2,1!
-set %4=!out:~3,1!
+set out=!out! !buf! 0 0 0 0
+for /f "tokens=1,2,3,4" %%b in ("!out!") do (
+	set %4=%%b
+	set %3=%%c
+	set %2=%%d
+	set %1=%%e
+)
 goto :eof
+
 :drop
 set fcount=0
 set fline=
 for %%i in (1 2 3 4) do (
 	for %%j in (1 2 3 4) do (
-		if !a%%i%%j! equ f (
-			set /a fcount=fcount+1
+		if !a%%i%%j! equ 0 (
+			set /a fcount+=1
 			set fline=!fline! a%%i%%j
 		)
 	)
 )
 if !fcount! lss 1 goto :eof
-set cell=0
-if !random! geq 29500 set cell=1
+set cell=2
+if !random! geq 29500 set cell=4
 set /a rand="!random!*!fcount!/32768+1"
 for %%k in (!fline!) do (
-	set /a rand=rand-1
+	set /a rand-=1
 	if !rand! equ 0 set %%k=!cell!
 )
 goto :eof
