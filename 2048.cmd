@@ -28,21 +28,25 @@ for %%i in (1 2 3 4) do (
 echo score = !score!
 echo bests = !bests!
 echo.
-choice /c xwasdr /n /m " [w]  [a]  [s]  [d] or e[x]it or [r]eset"
-if errorlevel 6 goto :init
-if errorlevel 5 (
+rem choice /c xwasdr /n /m " [w]  [a]  [s]  [d] or e[x]it or [r]eset"
+echo. [w]  [a]  [s]  [d] or e[x]it or [r]eset
+set key=
+for /f "delims=" %%a in ('xcopy /w "%~f0" "%~f0" 2^>nul') do if not defined key set key=%%a
+set "key=%key:~-1%"
+if /i "%key%"=="r" goto :init
+if /i "%key%"=="d" (
 	for %%i in (1 2 3 4) do call :calc a%%i1 a%%i2 a%%i3 a%%i4
 	goto :main
 )
-if errorlevel 4 (
+if /i "%key%"=="s" (
 	for %%i in (1 2 3 4) do call :calc a1%%i a2%%i a3%%i a4%%i
 	goto :main
 )
-if errorlevel 3 (
+if /i "%key%"=="a" (
 	for %%i in (1 2 3 4) do call :calc a%%i4 a%%i3 a%%i2 a%%i1
 	goto :main
 )
-if errorlevel 2 (
+if /i "%key%"=="w" (
 	for %%i in (1 2 3 4) do call :calc a4%%i a3%%i a2%%i a1%%i
 	goto :main
 )
