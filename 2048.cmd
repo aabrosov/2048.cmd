@@ -2,6 +2,7 @@
 setlocal enabledelayedexpansion
 title 2048 for cmd
 for /f %%a in (score_2048.txt) do set /a bests=0+%%a
+
 :init
 set score=0
 for %%i in (1 2 3 4) do (
@@ -9,31 +10,21 @@ for %%i in (1 2 3 4) do (
 		set a%%i%%j=0
 	)
 )
+
 call :drop
+
 :main
+
 call :drop
-cls
-if !score! gtr !bests! set bests=!score!
-for %%i in (1 2 3 4) do (
-	set line=
-	for %%j in (1 2 3 4) do (
-		set tmp=    !a%%i%%j!
-		if !tmp! equ 0 set "tmp=     "
-		set line=!line!Ё!tmp:~-5!Ё
-	)
-	echo зддддд©зддддд©зддддд©зддддд©
-	echo !line!
-	echo юдддддыюдддддыюдддддыюддддды
-)
-echo score = !score!
-echo bests = !bests!
-echo.
-rem choice /c xwasdr /n /m " [w]  [a]  [s]  [d] or e[x]it or [r]eset"
-echo. [w^|i^|8]  [a^|j^|4]  [s^|k^|2]  [d^|l^|6] or e[x]it or [q]uit or [r]eset
+
+call :draw
+
 :getkey
 set key=
 for /f "delims=" %%a in ('xcopy /w "%~f0" "%~f0" 2^>nul') do if not defined key set key=%%a
 set "key=%key:~-1%"
+set "quot=%key:"=%"
+if not defined quot goto :getkey
 if /i "%key%"=="r" goto :init
 if /i "%key%"=="d" goto :right
 if /i "%key%"=="l" goto :right
@@ -50,18 +41,23 @@ if /i "%key%"=="8" goto :up
 if /i "%key%"=="x" goto :exit
 if /i "%key%"=="q" goto :exit
 goto :getkey
+
 :up
 for %%i in (1 2 3 4) do call :calc a4%%i a3%%i a2%%i a1%%i
 goto :main
+
 :down
 for %%i in (1 2 3 4) do call :calc a1%%i a2%%i a3%%i a4%%i
 goto :main
+
 :left
 for %%i in (1 2 3 4) do call :calc a%%i4 a%%i3 a%%i2 a%%i1
 goto :main
+
 :right
 for %%i in (1 2 3 4) do call :calc a%%i1 a%%i2 a%%i3 a%%i4
 goto :main
+
 :exit
 echo.are you sure? [y/n]
 set key=
@@ -70,6 +66,7 @@ set "key=%key:~-1%"
 if /i "%key%" neq "y" goto :main
 if !score! gtr !bests! set bests=!score!
 echo !bests!>score_2048.txt
+exit
 goto :eof
 
 :calc
@@ -120,3 +117,26 @@ for %%k in (!fline!) do (
 	if !rand! equ 0 set %%k=!cell!
 )
 goto :eof
+
+:draw
+cls
+if !score! gtr !bests! set bests=!score!
+for %%i in (1 2 3 4) do (
+	set line=
+	for %%j in (1 2 3 4) do (
+		set tmp=    !a%%i%%j!
+		if !tmp! equ 0 set "tmp=     "
+		set line=!line!Ё!tmp:~-5!Ё
+	)
+	echo зддддд©зддддд©зддддд©зддддд©
+	echo !line!
+	echo юдддддыюдддддыюдддддыюддддды
+)
+echo score = !score!
+echo bests = !bests!
+echo.
+rem choice /c xwasdr /n /m " [w]  [a]  [s]  [d] or e[x]it or [r]eset"
+echo. control:  [w^|i^|8]  [a^|j^|4]  [s^|k^|2]  [d^|l^|6]
+echo.          or e[x]it or [q]uit or [r]eset
+goto :eof
+
