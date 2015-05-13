@@ -4,12 +4,10 @@ title 2048 for cmd
 for /f %%a in (score_2048.txt) do set /a bests=0+%%a
 
 :init
+set try=
+set changed=
 set score=0
-for %%i in (1 2 3 4) do (
-	for %%j in (1 2 3 4) do (
-		set a%%i%%j=0
-	)
-)
+for %%i in (1 2 3 4) do for %%j in (1 2 3 4) do set a%%i%%j=0
 
 call :drop
 
@@ -17,8 +15,13 @@ call :drop
 
 call :drop
 
+if not defined freecell if not defined changed set /a try+=1
+
+if !try! gtr 10 goto :badtry
+
 call :draw
 
+set changed=
 :getkey
 set key=
 for /f "delims=" %%a in ('xcopy /w "%~f0" "%~f0" 2^>nul') do if not defined key set key=%%a
@@ -58,8 +61,11 @@ goto :main
 for %%i in (1 2 3 4) do call :calc a%%i1 a%%i2 a%%i3 a%%i4
 goto :main
 
+:badtry
+echo.so many bad tries
+set try=
 :exit
-echo.are you sure? [y/n]
+echo.are you want to exit? [y/n]
 set key=
 for /f "delims=" %%a in ('xcopy /w "%~f0" "%~f0" 2^>nul') do if not defined key set key=%%a
 set "key=%key:~-1%"
@@ -88,7 +94,9 @@ for %%a in (!inl!) do (
 	set out=!out! !buf!
 	set buf=!cur!
 )
-set out=!out! !buf! 0 0 0 0
+set out=!out! !buf!
+if not " !inl!"=="!out!" set changed=yes
+set out=!out! 0 0 0 0
 for /f "tokens=1,2,3,4" %%b in ("!out!") do (
 	set %4=%%b
 	set %3=%%c
@@ -98,23 +106,24 @@ for /f "tokens=1,2,3,4" %%b in ("!out!") do (
 goto :eof
 
 :drop
-set fcount=0
-set fline=
+set freecell=
+set freelist=
 for %%i in (1 2 3 4) do (
 	for %%j in (1 2 3 4) do (
 		if !a%%i%%j! equ 0 (
-			set /a fcount+=1
-			set fline=!fline! a%%i%%j
+			set /a freecell+=1
+			set freelist=!freelist! a%%i%%j
 		)
 	)
 )
-if !fcount! lss 1 goto :eof
-set cell=2
-if !random! geq 29500 set cell=4
-set /a rand="!random!*!fcount!/32768+1"
-for %%k in (!fline!) do (
-	set /a rand-=1
-	if !rand! equ 0 set %%k=!cell!
+if defined freelist (
+	set cell=2
+	if !random! geq 29500 set cell=4
+	set /a rand=!random!*!freecell!/32768+1
+	for %%k in (!freelist!) do (
+		set /a rand-=1
+		if !rand! equ 0 set %%k=!cell!
+	)
 )
 goto :eof
 
