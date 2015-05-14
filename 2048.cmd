@@ -13,16 +13,16 @@ call :drop
 
 :main
 
-call :drop
+if not defined freecell goto :exit
 
-if not defined freecell if not defined changed set /a try+=1
+if not defined try call :drop
 
-if !try! gtr 10 goto :badtry
 
 call :draw
 
 set changed=
 :getkey
+if !try! gtr 10 goto :badtry
 set key=
 for /f "delims=" %%a in ('xcopy /w "%~f0" "%~f0" 2^>nul') do if not defined key set key=%%a
 set "key=%key:~-1%"
@@ -47,19 +47,44 @@ goto :getkey
 
 :up
 for %%i in (1 2 3 4) do call :calc a4%%i a3%%i a2%%i a1%%i
-goto :main
+if not defined changed (
+	set /a try+=1
+	goto :getkey
+) else (
+	set try=
+	goto :main
+)
+
 
 :down
 for %%i in (1 2 3 4) do call :calc a1%%i a2%%i a3%%i a4%%i
-goto :main
+if not defined changed (
+	set /a try+=1
+	goto :getkey
+) else (
+	set try=
+	goto :main
+)
 
 :left
 for %%i in (1 2 3 4) do call :calc a%%i4 a%%i3 a%%i2 a%%i1
-goto :main
+if not defined changed (
+	set /a try+=1
+	goto :getkey
+) else (
+	set try=
+	goto :main
+)
 
 :right
 for %%i in (1 2 3 4) do call :calc a%%i1 a%%i2 a%%i3 a%%i4
-goto :main
+if not defined changed (
+	set /a try+=1
+	goto :getkey
+) else (
+	set try=
+	goto :main
+)
 
 :badtry
 echo.so many bad tries
@@ -76,6 +101,7 @@ exit
 goto :eof
 
 :calc
+set before=!%1!,!%2!,!%3!,!%4!
 set inl=
 if !%4! neq 0 set inl=!inl! !%4!
 if !%3! neq 0 set inl=!inl! !%3!
@@ -94,15 +120,16 @@ for %%a in (!inl!) do (
 	set out=!out! !buf!
 	set buf=!cur!
 )
-set out=!out! !buf!
-if not " !inl!"=="!out!" set changed=yes
-set out=!out! 0 0 0 0
+set out=!out! !buf! 0 0 0 0
 for /f "tokens=1,2,3,4" %%b in ("!out!") do (
 	set %4=%%b
 	set %3=%%c
 	set %2=%%d
 	set %1=%%e
+	set after=%%e,%%d,%%c,%%b
 )
+rem echo "!before!"=="!after!"
+if not "!before!"=="!after!" set changed=yes
 goto :eof
 
 :drop
